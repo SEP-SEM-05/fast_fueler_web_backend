@@ -23,6 +23,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
+      - name: Create env file
+        run: |
+          touch .env
+          echo JWT_ENV=${{ secrets.JWT_ENV }} >> .env
+          echo DB_URI=${{ secrets.DB_URI }} >> .env
+          echo DB_TEST_URI=${{ secrets.DB_TEST_URI }} >> .env
+          echo ACCESS_TOKEN_SECRET_KEY=${{ secrets.ACCESS_TOKEN_SECRET_KEY }} >> .env
+          echo REFRESH_TOKEN_SECRET_KEY=${{ secrets.REFRESH_TOKEN_SECRET_KEY }} >> .env
+          echo ACCESS_EXP=${{ secrets.ACCESS_EXP }} >> .env
+          echo REFRESH_EXP=${{ secrets.REFRESH_EXP }} >> .env
+          echo ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }} >> .env
+          echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
+          cat .env
       - name: Install dependencies
         run: npm ci
       - name: Build project
