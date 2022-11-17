@@ -19,7 +19,7 @@ authRouter.post("/api/signin", async (req, res) => {
       );
 
       if (password_check) {
-        const token = jwt.sign({ id: user._id }, "passwordKey");
+        const token = jwt.sign({ id: user.registrationNo }, "passwordKey");
         res.json({ token, ...user._doc });
       } else {
         res.status(400).json({
@@ -45,7 +45,7 @@ authRouter.post("/tokenIsValid", async (req, res) => {
     const verified = jwt.verify(token, "passwordKey");
     if (!verified) return res.json(false);
 
-    const user = await stationDBHelper.findStationByID(verified.id);
+    const user = await stationDBHelper.findStationByRegNo(verified.id);
     if (!user) return res.json(false);
     res.json(true);
   } catch (e) {
@@ -55,8 +55,8 @@ authRouter.post("/tokenIsValid", async (req, res) => {
 
 // get user data
 authRouter.get("/", mobileAuth, async (req, res) => {
-  const user = await stationDBHelper.findStationByID(req.user); 
-  res.json({ ...user._doc, token: req.token }); 
+  const user = await stationDBHelper.findStationByRegNo(req.user);
+  res.json({ ...user._doc, token: req.token });
 });
 
 module.exports = authRouter;
