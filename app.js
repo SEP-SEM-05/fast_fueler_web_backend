@@ -37,7 +37,7 @@ const makeApp = () => {
 
     //root path
     app.get('/', (req, res) => {
-        res.send("Welcome to Fast Fueler Back-End!");
+        res.send("Welcome to Fast-Fueler Back-End!");
     });
 
     //routes
