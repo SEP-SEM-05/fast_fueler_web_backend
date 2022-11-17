@@ -25,6 +25,12 @@ const makeApp = () => {
     // middleware & static files
     app.use(express.urlencoded({ extended: true }));
 
+    app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        next();
+    });
+
     // set static file path for productioin build
     if (process.env.NODE_ENV === 'production') {
         app.use(express.static('client/build'));
@@ -48,8 +54,8 @@ const makeApp = () => {
     app.use('/station', stationRoutes);
     app.use("/mobileauth", mobileauthroutes);
 
-    return app; 
-} 
+    return app;
+}
 
 module.exports = {
     makeApp
