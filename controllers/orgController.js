@@ -290,8 +290,9 @@ const request_fuel = async (req, res) => {
 
             for(let i = 0; i < all_station_queues.length; i++){
 
-                if(all_station_queues[i].state === "announced" && parseFloat(all_station_queues[i].selectedAmount) >= remainingQuota){
-
+                if((all_station_queues[i].state === "announced" || all_station_queues[i].state === "active") && parseFloat(all_station_queues[i].selectedAmount) >= remainingQuota){
+                    let vehicle_count = parseInt(all_station_queues[i].vehicleCount);
+                    announced_queue_ids.push(all_station_queues[i]._id.toString() + '&' + (vehicle_count+1));
                     announced_queue_ids.push(all_station_queues[i]._id);
                     queue_announced_stations.push(all_station_queues[i].stationID);
 
@@ -306,7 +307,6 @@ const request_fuel = async (req, res) => {
                         }
                     }
 
-                    let vehicle_count = parseInt(all_station_queues[i].vehicleCount);
                     let start_time = new Date(all_station_queues[i].queueStartTime);
                     let curr_end_time = new Date(all_station_queues[i].estimatedEndTime);
                     let est_time_for_vehicle = Math.abs(Math.round((start_time.getTime() - curr_end_time.getTime()) / (1000 * 60 * vehicle_count)));

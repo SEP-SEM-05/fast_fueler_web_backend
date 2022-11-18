@@ -304,21 +304,21 @@ const fill_request = async (req, res) => {
             let isFilled = true;
             let reqState = "closed";
 
-            await requestDBHelper.closeRequest(
-              selected_req._id,
-              stationRegNo,
-              isFilled,
-              filledDate,
-              filledAmount,
-              reqState
-            );
+            // await requestDBHelper.closeRequest(
+            //   selected_req._id,
+            //   stationRegNo,
+            //   isFilled,
+            //   filledDate,
+            //   filledAmount,
+            //   reqState
+            // );
 
             if (userType === "personal") {
-              await vehicleDBHelper.updateFillingDetails(
-                regNo,
-                filledDate,
-                filledAmount
-              );
+              // await vehicleDBHelper.updateFillingDetails(
+              //   regNo,
+              //   filledDate,
+              //   filledAmount
+              // );
             } else {
               let fuelTypeInd = 0;
               let generalFuelType = "Diesel";
@@ -342,21 +342,29 @@ const fill_request = async (req, res) => {
               );
             }
 
-            await queueDBHelper.removeReqFromActiveQueue(stationRegNo, fuelType, [req_id]);
+            // await queueDBHelper.removeReqFromActiveQueue(stationRegNo, fuelType, [req_id]);
 
-            let sts = await requestDBHelper.getStationsOfReq(req_id);
-            for (let i = 0; i < sts.length; i++) {
-              if (sts[i] !== stationRegNo) {
-                await queueDBHelper.removeReqsFromWaitingQueue(sts[i], fuelType, [req_id]);
-              }
-            }
+            // let sts = await requestDBHelper.getStationsOfReq(req_id);
+            // for (let i = 0; i < sts.length; i++) {
+            //   if (sts[i] !== stationRegNo) {
+            //     await queueDBHelper.removeReqsFromWaitingQueue(sts[i], fuelType, [req_id]);
+            //   }
+            // }
 
             //update selected amount of the queue
             let newQueueSelectedAmount =
               parseFloat(queue.selectedAmount) - filledAmount;
-            await queueDBHelper.updateSlectedAmount(
+            let a = await queueDBHelper.updateSlectedAmount(
               queueId,
               newQueueSelectedAmount.toString()
+            );
+
+            console.log(a);
+
+            await stationDBHelper.reduceFuelAmount(
+              stationRegNo,
+              fuelType,
+              filledAmount
             );
 
             //if selected amount less than or equals zero close the queue

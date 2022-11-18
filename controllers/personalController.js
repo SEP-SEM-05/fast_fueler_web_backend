@@ -242,13 +242,14 @@ const request_fuel = async (req, res) => {
             let queue_announced_stations = [];
 
             let notifications = [];
-
+            console.log(all_station_queues);
             for(let i = 0; i < all_station_queues.length; i++){
 
                 //check if the remaining quota is less than or equals to the selected amount of the queue
-                if(all_station_queues[i].state === "announced" && parseFloat(all_station_queues[i].selectedAmount) >= remainingQuota){
-
-                    announced_queue_ids.push(all_station_queues[i]._id);
+                if((all_station_queues[i].state === "announced" || all_station_queues[i].state === "active") && parseFloat(all_station_queues[i].selectedAmount) >= remainingQuota){
+                    // console.log("methana", all_station_queues[i]);
+                    let vehicle_count = parseInt(all_station_queues[i].vehicleCount);
+                    announced_queue_ids.push(all_station_queues[i]._id.toString() + '&' + (vehicle_count+1));
                     queue_announced_stations.push(all_station_queues[i].stationID);
 
                     let station_str = "";
@@ -262,10 +263,9 @@ const request_fuel = async (req, res) => {
                         }
                     }
 
-                    let vehicle_count = parseInt(all_station_queues[i].vehicleCount);
                     let start_time = new Date(all_station_queues[i].queueStartTime);
                     let curr_end_time = new Date(all_station_queues[i].estimatedEndTime);
-                    let est_time_for_vehicle = Math.abs(Math.round((start_time.getTime() - curr_end_time.getTime()) / (1000 * 60 * vehicle_count)));
+                    let est_time_for_vehicle = vehicle_count == 0 ?  Math.abs(Math.round((start_time.getTime() - curr_end_time.getTime()) / (1000 * 60))) : Math.abs(Math.round((start_time.getTime() - curr_end_time.getTime()) / (1000 * 60 * vehicle_count)));
                     let new_end_time = curr_end_time.setMinutes(curr_end_time.getMinutes() + est_time_for_vehicle);
 
                     //update the new end time
@@ -287,6 +287,7 @@ const request_fuel = async (req, res) => {
             //save notifications
             await notificationDBHelper.addNewNotifications(notifications);
 
+            // console.log(queue_announced_stations);
             let waiting_queue_ids = [];
             for(let i = 0; i < all_station_queues.length; i++){
 
@@ -295,6 +296,7 @@ const request_fuel = async (req, res) => {
                 }
             }
 
+            // console.log(announced_queue_ids.concat(waiting_queue_ids));
             await queueDBHelper.addToQueue(announced_queue_ids.concat(waiting_queue_ids), reqId);
 
             res.json({
