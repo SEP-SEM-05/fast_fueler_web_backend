@@ -68,6 +68,13 @@ const updateFillingDetails = async (regNo, lastFilledDate, usedQuota) => {
     return result;
 }
 
+//get count of each type of vehicles, given the fuel type
+const countEachTypeVehicle = async (fuelType, vehType) => {
+
+    let vehicleCount = await Vehicle.count({fuelType: fuelType, type: vehType, isRegistered: true});
+    return vehicleCount;
+}
+
 module.exports = {
     findVehicleByRegNo,
     findVehicleByRegNoAndEngNo,
@@ -79,4 +86,5 @@ module.exports = {
     findTypeAllByNic,
     findTypeAllByregistrationNoArray,
     updateFillingDetails,
+    countEachTypeVehicle
 }
