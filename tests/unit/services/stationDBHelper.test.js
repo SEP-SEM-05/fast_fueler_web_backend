@@ -219,6 +219,3 @@ describe("Database access methods for fuel stations", () => {
     });
 });
 
-//remaining
-
-// registerAllStation,

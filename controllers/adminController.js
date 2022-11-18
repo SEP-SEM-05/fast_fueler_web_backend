@@ -27,7 +27,7 @@ const get_dashboard = async (req, res) => {
 
         let quota = await quotaDBHelper.findQuotaByFuelType(fuelType);
         console.log(quota)
-        if(quota !== null){
+        if(quota.length > 0){
             res.json({
                 status: 'ok',
                 quota: quota,
@@ -332,7 +332,6 @@ const get_personal_vehicles = async (req, res) => {
 //find the personal registered vehicles of a given vehicle type
 const get_type_personal_vehicles = async (req, res) => {
     
-    //let type = req.params.type;
     const vehicleType = ["A-Bicycle", "B-Car", "C-Lorry", "D-Bus", "G-Agricultural", "J-Special Purpose"];
     let vehicleCount = [];
 
@@ -429,23 +428,6 @@ const get_type_org_vehicles = async (req, res) => {
 
         let clients = await orgDBHelper.findAllClient();
 
-        // for (let i = 0; i < clients.length; i++ ) {
-        //     let client = clients[i]
-        //     let vehicles = await vehicleDBHelper.findTypeAllByregistrationNoArray(client.vehicles,type);
-        //     //console.log(vehicles)
-        //     vehicles.forEach(async veh => {
-        //         vehicleList.push(veh)
-        //     })
-        // }
-        // if(vehicleList !== null){
-                
-        //     res.json({
-        //         status: 'ok',
-        //         vehicleCount: vehicleList,
-        //         //...................................................
-        //     });
-        // }
-
         for (let n = 0; n < vehicleType.length; n++ ) {
             let type = vehicleType[n];
             let vehicleList = [];
@@ -488,6 +470,7 @@ const get_type_org_vehicles = async (req, res) => {
 //send email to station
 const send_email = async (req, res) => {
     let regNo = req.body.regNo;
+    let station = req.body;
 
     let password = generator.generate({
         length: 10,
@@ -496,9 +479,9 @@ const send_email = async (req, res) => {
 
     const msg = {
         from: "fastfueler001@gmail.com",
-        to: req.body.email,
+        to: station.email,
         subject: "Welcome to Fast Fueler",
-        text: "Now you can go to this link (http://localhost:3000/fuelstationgetstands/"+regNo+") and login to our system using this temporary password \nTemp password: " + password
+        text: "Welcome to Fast Fueler! Now you can join with us using this link (https://fast-fueler-frontend.firebaseapp.com/fuelstationgetstands/"+regNo+") and login to your account using this temporary password \nTemp password: " + password+"\n\nThank you!"
     };
 
     try{
@@ -555,7 +538,7 @@ const send_email_to_all = async (req, res) => {
                 from: "fastfueler001@gmail.com",
                 to: station.email,
                 subject: "Welcome to Fast Fueler",
-                text: "Now you can go to this link (http://localhost:3000/fuelstationgetstands/"+regNo+") and login to our system using this temporary password \nTemp password: " + password
+                text: "Welcome to Fast Fueler! Now you can join with us using this link (https://fast-fueler-frontend.firebaseapp.com/fuelstationgetstands/"+regNo+") and login to your account using this temporary password \nTemp password: " + password+"\n\nThank you!"
             };
     
             nodemailer.createTransport({
@@ -588,6 +571,48 @@ const send_email_to_all = async (req, res) => {
     }
 }
 
+//get count of each vehicle type
+const get_count_vehicle = async (req, res) => {
+
+    const vehicleType = ["A-Bicycle", "B-Car", "C-Lorry", "D-Bus", "G-Agricultural", "J-Special Purpose"];
+    let petrolVehicleCount = [];
+    let dieselVehicleCount = [];
+
+    try{
+        
+        for (let n = 0; n < vehicleType.length; n++ ) {
+            let type = vehicleType[n];
+
+            let petVehCount = await vehicleDBHelper.countEachTypeVehicle("Petrol",type);
+            let delVehCount = await vehicleDBHelper.countEachTypeVehicle("Diesel",type);
+
+            petrolVehicleCount.push(petVehCount);
+            dieselVehicleCount.push(delVehCount);                
+            
+        };
+
+        if(petrolVehicleCount !== null && dieselVehicleCount !== null){
+            res.json({
+                status: 'ok',
+                petrolVelCount: petrolVehicleCount,
+                dieselVelCount: dieselVehicleCount,
+            }); 
+        }
+        else{
+            res.status(400).json({
+                status: 'error',
+                error: 'Invalid Output!'
+            });
+        }  
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({
+            status: 'error',
+            error: 'Internal server error!'
+        });
+    }
+}
 
 module.exports = {
     get_dashboard,
@@ -606,4 +631,5 @@ module.exports = {
     get_type_personal_vehicles,
     get_org_vehicles,
     get_type_org_vehicles,
+    get_count_vehicle
 }

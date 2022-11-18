@@ -59,4 +59,12 @@ describe("Database access methods for quotas", () => {
             expect(quotas.length > 0).toBeTruthy();
         });
     });
+    describe("updateQuota - update the fuel quota, given the vehicle type and fuel type", () => {
+
+        it("should update the amount of given vehicle type and fuel type", async () => {
+
+            const result = await updateQuota("testOnlyVehicleType", "testOnlyFuelType", 50);
+            expect(result === null).toEqual(false);
+        });
+    });
 });

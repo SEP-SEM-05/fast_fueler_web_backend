@@ -12,7 +12,7 @@ const Vehicle = require('../../../models/vehicle');
 const Quota = require('../../../models/quota');
 const Request = require('../../../models/request');
 
-const { findVehicleByRegNo, findVehicleByRegNoAndEngNo, findAllByNic, findAllByregistrationNoArray, updateStationsAndRegister, registerAll, getQuotas, findTypeAllByNic, findTypeAllByregistrationNoArray } = require('../../../services/vehicleDBHelper');
+const { findVehicleByRegNo, findVehicleByRegNoAndEngNo, findAllByNic, findAllByregistrationNoArray, updateStationsAndRegister, registerAll, getQuotas, findTypeAllByNic, findTypeAllByregistrationNoArray, updateFillingDetails, countEachTypeVehicle } = require('../../../services/vehicleDBHelper');
 
 describe("Database access methods for vehicles", () => {
 
@@ -306,8 +306,23 @@ describe("Database access methods for vehicles", () => {
             expect(queriedVehicles.length > 0).toBeTruthy();
         });
     });
+
+    describe("updateFillingDetails - update the last filling details provided the registrationNo", () => {
+
+        it("should update the given details of the given vehicle", async () => {
+
+            const result = await updateFillingDetails("testOnlyVehicle01", null, 5);
+            expect(result === null).toEqual(false);
+        });
+    });
+
+    describe("countEachTypeVehicle - get count of given vehicle type and given fuel type", () => {
+
+        it("should return a number of vehicles, given vehicle type and fuel type", async () => {
+
+            const result = await countEachTypeVehicle("Petrol", "B-Car");
+
+            expect(result !== null).toEqual(true);
+        });
+    });
 });
-
-//remaining
-
-// updateFillingDetails,
