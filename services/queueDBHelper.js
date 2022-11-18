@@ -142,6 +142,29 @@ const createNewQueue = (regNo, ftype) => {
     });
 }
 
+// remove req after refilled
+const removeReqFromActiveQueue = async (regNo, ftype, reqs) => {
+    let wq = await Queue.findOne({
+        stationID: regNo,
+        state: "active",
+        fuelType: ftype,
+    });
+
+    let reqArr = wq.requests;
+    let reqsToDeleteSet = new Set(reqs);
+
+    let filteredReqs = reqArr.filter((name) => {
+        return !reqsToDeleteSet.has(name);
+    });
+
+    let result = await Queue.findOneAndUpdate(
+      { stationID: regNo, state: "active", fuelType: ftype },
+      { requests: filteredReqs, vehicleCount: filteredReqs.length },
+      { new: true }
+    );
+    return result.requests;
+}
+
 module.exports = {
     addToQueue,
     findQueuesByRegNoAndFuel,
@@ -153,5 +176,6 @@ module.exports = {
     updateQueue,
     findQueueById,
     updateSlectedAmount,
-    createNewQueue
+    createNewQueue,
+    removeReqFromActiveQueue
 };
