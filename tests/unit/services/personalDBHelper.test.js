@@ -9,7 +9,7 @@ require('dotenv').config();
 const conn = require('../../../db_connection');
 
 const Personal = require('../../../models/personal');
-const {saveClient, saveRefreshToken, findClientByNic, findClientByID, findAllClient } = require('../../../services/personalDBHelper');
+const {saveClient, saveRefreshToken, findClientByNic, findClientByID } = require('../../../services/personalDBHelper');
 
 describe("Database access methods for personal clients", () => {
     
@@ -163,13 +163,4 @@ describe("Database access methods for personal clients", () => {
         });
     });
 
-    describe("findAllClient - Get all the personal clients", () => {
-
-        it("should return an array of organizations", async () => {
-
-            const quriedClients = await findAllClient();
-
-            expect(quriedClients.length > 0).toEqual(true);
-        });
-    });
 });
