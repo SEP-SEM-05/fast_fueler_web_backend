@@ -355,13 +355,13 @@ const fill_request = async (req, res) => {
             let newQueueSelectedAmount =
               parseFloat(queue.selectedAmount) - filledAmount;
             await queueDBHelper.updateSlectedAmount(
-              queue._id,
+              queueId,
               newQueueSelectedAmount.toString()
             );
 
             //if selected amount less than or equals zero close the queue
             if (newQueueSelectedAmount <= 0) {
-              await queueDBHelper.updateQueue(queue._id, "ended", null);
+              await queueDBHelper.updateQueue(queueId, "ended", null);
             }
 
             res.json({
