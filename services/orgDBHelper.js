@@ -52,13 +52,6 @@ const updateFullQuotas = async (regNo, fullQuotas) => {
     return result;
 }
 
-//find all org clients
-const findAllClient = async () => {
-
-    let clients = await Org.find();
-    return clients;
-}
-
 //update the last filling details provided the registrationNo
 const updateFillingDetails = async (regNo, lastFilledDate, remainingQuotas) => {
     let result = await Org.findOneAndUpdate({registrationNo: regNo}, {$set: {lastFilledDate, remainingQuotas}});
@@ -73,6 +66,5 @@ module.exports = {
     findClientByID,
     updateStations,
     updateFullQuotas,
-    findAllClient,
     updateFillingDetails,
 }

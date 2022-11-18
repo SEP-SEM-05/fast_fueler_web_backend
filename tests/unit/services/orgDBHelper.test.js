@@ -9,7 +9,7 @@ require('dotenv').config();
 const conn = require('../../../db_connection');
 
 const Organization = require('../../../models/organization');
-const { saveClient, saveRefreshToken, findClientByRegNo, findOrgByRegNo, findClientByID, updateStations, updateFullQuotas, findAllClient, updateFillingDetails } = require('../../../services/orgDBHelper');
+const { saveClient, saveRefreshToken, findClientByRegNo, findOrgByRegNo, findClientByID, updateStations, updateFullQuotas, updateFillingDetails } = require('../../../services/orgDBHelper');
 
 describe("Database access methods for organizations", () => {
 
@@ -92,16 +92,6 @@ describe("Database access methods for organizations", () => {
             const quriedClient = await findOrgByRegNo('mockRegNo999');
 
             expect(quriedClient._id).toEqual(mongoose.Types.ObjectId("6335c554d94e2a08227ac7b2"));
-        });
-    });
-
-    describe("findAllClient - Get all the organizations", () => {
-
-        it("should return an array of organizations", async () => {
-
-            const quriedClients = await findAllClient();
-
-            expect(quriedClients.length > 0).toEqual(true);
         });
     });
 
