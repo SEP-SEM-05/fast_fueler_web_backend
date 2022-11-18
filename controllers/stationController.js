@@ -132,7 +132,6 @@ const get_waiting_queues = async (req, res) => {
 
 // announce a queue
 const announce_fuel_queue = async (req, res) => {
-  //console.log(req.body);
   regNo = req.body.regNo;
   ftype = req.body.fuelType;
   lastAnnounced = req.body.announcedTime;
@@ -147,7 +146,6 @@ const announce_fuel_queue = async (req, res) => {
       ftype,
       lastAnnounced
     ); // update last announced date
-    // console.log(result1);
 
     let reqs = [];
     let dataArr = [];
@@ -180,10 +178,8 @@ const announce_fuel_queue = async (req, res) => {
       vehicles.length,
       selectedAmount
     ); // start a new announced queue
-    // console.log(result2);
 
     let result3 = await notificationDBHelper.addNewNotifications(dataArr);
-    // console.log(result3);
 
     let result4 = await queueDBHelper.removeReqsFromWaitingQueue(
       regNo,
@@ -256,7 +252,6 @@ const update_queue = async (req, res) => {
 const fill_request = async (req, res) => {
   //#provided data
   //reg_no, queue_id, filled_amount, fuel_type, user_type
-  console.log(req.body);
   let regNo = req.body.registrationNo; // vehicle or org
   let stationRegNo = req.body.stationRegNo;
   let queueId = req.body.queueID;
@@ -303,21 +298,21 @@ const fill_request = async (req, res) => {
             let isFilled = true;
             let reqState = "closed";
 
-            // await requestDBHelper.closeRequest(
-            //   selected_req._id,
-            //   stationRegNo,
-            //   isFilled,
-            //   filledDate,
-            //   filledAmount,
-            //   reqState
-            // );
+            await requestDBHelper.closeRequest(
+              selected_req._id,
+              stationRegNo,
+              isFilled,
+              filledDate,
+              filledAmount,
+              reqState
+            );
 
             if (userType === "personal") {
-              // await vehicleDBHelper.updateFillingDetails(
-              //   regNo,
-              //   filledDate,
-              //   filledAmount
-              // );
+              await vehicleDBHelper.updateFillingDetails(
+                regNo,
+                filledDate,
+                filledAmount
+              );
             } else {
               let fuelTypeInd = 0;
               let generalFuelType = "Diesel";
@@ -341,24 +336,23 @@ const fill_request = async (req, res) => {
               );
             }
 
-            // await queueDBHelper.removeReqFromActiveQueue(stationRegNo, fuelType, [req_id]);
+            await queueDBHelper.removeReqFromActiveQueue(stationRegNo, fuelType, [req_id]);
 
-            // let sts = await requestDBHelper.getStationsOfReq(req_id);
-            // for (let i = 0; i < sts.length; i++) {
-            //   if (sts[i] !== stationRegNo) {
-            //     await queueDBHelper.removeReqsFromWaitingQueue(sts[i], fuelType, [req_id]);
-            //   }
-            // }
+            let sts = await requestDBHelper.getStationsOfReq(req_id);
+            for (let i = 0; i < sts.length; i++) {
+              if (sts[i] !== stationRegNo) {
+                await queueDBHelper.removeReqsFromWaitingQueue(sts[i], fuelType, [req_id]);
+              }
+            }
 
             //update selected amount of the queue
             let newQueueSelectedAmount =
               parseFloat(queue.selectedAmount) - filledAmount;
-            let a = await queueDBHelper.updateSlectedAmount(
+            await queueDBHelper.updateSlectedAmount(
               queueId,
               newQueueSelectedAmount.toString()
             );
 
-            console.log(a);
 
             await stationDBHelper.reduceFuelAmount(
               stationRegNo,
@@ -427,7 +421,6 @@ const get_active_queues = async (req, res) => {
 
     try {
         let queues = await queueDBHelper.findQueuesByStRegNo(regNo, ["active"]);
-        // console.log(queues);
         let f_qs = [];
         for (let i = 0; i < queues.length; i++) {
           let queue = queues[i];
@@ -454,7 +447,6 @@ const get_active_queues = async (req, res) => {
           a._id = queue.id.toString();
           f_qs.push(a);
         }
-        // console.log(f_qs[1].requests);
         res.json(f_qs);
     } catch (err) {
         console.log(err);
