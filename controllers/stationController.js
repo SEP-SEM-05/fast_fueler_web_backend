@@ -330,7 +330,7 @@ const fill_request = async (req, res) => {
               }
 
               let currLastFilledDate = user.lastFilledDate.toJSON();
-              currLastFilledDate.generalFuelType = filledDate;
+              currLastFilledDate[generalFuelType] = filledDate;
 
               let currRemainingQuotas = user.remainingQuotas;
               currRemainingQuotas[fuelTypeInd] -= filledAmount;

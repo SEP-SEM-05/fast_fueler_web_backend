@@ -1,0 +1,52 @@
+name: Build and Deploy to Firebase Hosting
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    name: Build
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Create env file
+        run: |
+          touch .env
+          echo JWT_ENV=${{ secrets.JWT_ENV }} >> .env
+          echo DB_URI=${{ secrets.DB_URI }} >> .env
+          echo DB_TEST_URI=${{ secrets.DB_TEST_URI }} >> .env
+          echo ACCESS_TOKEN_SECRET_KEY=${{ secrets.ACCESS_TOKEN_SECRET_KEY }} >> .env
+          echo REFRESH_TOKEN_SECRET_KEY=${{ secrets.REFRESH_TOKEN_SECRET_KEY }} >> .env
+          echo ACCESS_EXP=${{ secrets.ACCESS_EXP }} >> .env
+          echo REFRESH_EXP=${{ secrets.REFRESH_EXP }} >> .env
+          echo ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }} >> .env
+          echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
+          cat .env
+      - name: Install dependencies
+        run: npm ci
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Deploy to Firebase Hosting
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
