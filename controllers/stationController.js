@@ -230,10 +230,9 @@ const get_announced_queues = async (req, res) => {
 
 // update a queue
 const update_queue = async (req, res) => {
-  console.log(req.body);
-  let id = req.body.id;
-  let state = req.body.state;
-  let estEndTime = req.body.estEndTime;
+    let id = req.body.id;
+    let state = req.body.state;
+    let estEndTime = req.body.estEndTime;
 
   try {
     //handle any possible errors

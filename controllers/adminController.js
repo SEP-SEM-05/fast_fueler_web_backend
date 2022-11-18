@@ -19,7 +19,6 @@ const get_dashboard = async (req, res) => {
     try{
 
         let quota = await quotaDBHelper.findQuotaByFuelType(fuelType);
-        console.log(quota)
         if(quota.length > 0){
             res.json({
                 status: 'ok',
@@ -75,7 +74,6 @@ const get_registered_station = async (req, res) => {
     try{
 
         let station = await stationDBHelper.findAllRegisteredStations();
-        console.log(station)
         if(station !== null){
             res.json({
                 status: 'ok',
@@ -171,7 +169,6 @@ const get_count_registered_station = async (req, res) => {
     try{
 
         let stationCount = await stationDBHelper.countRegisteredStations(stationType);
-        console.log(stationCount)
         if(stationCount !== null){
             res.json({
                 status: 'ok',
@@ -200,7 +197,6 @@ const get_unregistered_station = async (req, res) => {
     try{
 
         let station = await stationDBHelper.findAllUnregisteredStations();
-        console.log(station)
         if(station !== null){
             res.json({
                 status: 'ok',
@@ -229,7 +225,6 @@ const get_newlyregistered_station = async (req, res) => {
     try{
 
         let station = await stationDBHelper.findAllNewlyregisteredStations();
-        console.log(station)
         if(station !== null){
             res.json({
                 status: 'ok',
