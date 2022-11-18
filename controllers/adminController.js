@@ -27,7 +27,7 @@ const get_dashboard = async (req, res) => {
 
         let quota = await quotaDBHelper.findQuotaByFuelType(fuelType);
         console.log(quota)
-        if(quota !== null){
+        if(quota.length > 0){
             res.json({
                 status: 'ok',
                 quota: quota,
@@ -332,7 +332,6 @@ const get_personal_vehicles = async (req, res) => {
 //find the personal registered vehicles of a given vehicle type
 const get_type_personal_vehicles = async (req, res) => {
     
-    //let type = req.params.type;
     const vehicleType = ["A-Bicycle", "B-Car", "C-Lorry", "D-Bus", "G-Agricultural", "J-Special Purpose"];
     let vehicleCount = [];
 
@@ -428,23 +427,6 @@ const get_type_org_vehicles = async (req, res) => {
     try{
 
         let clients = await orgDBHelper.findAllClient();
-
-        // for (let i = 0; i < clients.length; i++ ) {
-        //     let client = clients[i]
-        //     let vehicles = await vehicleDBHelper.findTypeAllByregistrationNoArray(client.vehicles,type);
-        //     //console.log(vehicles)
-        //     vehicles.forEach(async veh => {
-        //         vehicleList.push(veh)
-        //     })
-        // }
-        // if(vehicleList !== null){
-                
-        //     res.json({
-        //         status: 'ok',
-        //         vehicleCount: vehicleList,
-        //         //...................................................
-        //     });
-        // }
 
         for (let n = 0; n < vehicleType.length; n++ ) {
             let type = vehicleType[n];
@@ -588,6 +570,49 @@ const send_email_to_all = async (req, res) => {
     }
 }
 
+//get count of each vehicle type
+const get_count_vehicle = async (req, res) => {
+
+    const vehicleType = ["A-Bicycle", "B-Car", "C-Lorry", "D-Bus", "G-Agricultural", "J-Special Purpose"];
+    let petrolVehicleCount = [];
+    let dieselVehicleCount = [];
+
+    try{
+        
+        for (let n = 0; n < vehicleType.length; n++ ) {
+            let type = vehicleType[n];
+
+            let petVehCount = await vehicleDBHelper.countEachTypeVehicle("Petrol",type);
+            let delVehCount = await vehicleDBHelper.countEachTypeVehicle("Diesel",type);
+
+            petrolVehicleCount.push(petVehCount);
+            dieselVehicleCount.push(delVehCount);                
+            
+        };
+
+        if(petrolVehicleCount !== null && dieselVehicleCount !== null){
+            res.json({
+                status: 'ok',
+                petrolVelCount: petrolVehicleCount,
+                dieselVelCount: dieselVehicleCount,
+            }); 
+        }
+        else{
+            res.status(400).json({
+                status: 'error',
+                error: 'Invalid Output!'
+            });
+        }  
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({
+            status: 'error',
+            error: 'Internal server error!'
+        });
+    }
+}
+
 
 module.exports = {
     get_dashboard,
@@ -606,4 +631,5 @@ module.exports = {
     get_type_personal_vehicles,
     get_org_vehicles,
     get_type_org_vehicles,
+    get_count_vehicle
 }
