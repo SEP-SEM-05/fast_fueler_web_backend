@@ -121,6 +121,26 @@ const updateSlectedAmount = async (id, amount) => {
     return result;
 }
 
+// create new queue
+const createNewQueue = (regNo, ftype) => {
+
+    return new Promise(async (resolve, reject) => {
+        let data = {
+            stationID: regNo,
+            fuelType: ftype
+        };
+
+        let queue = new Queue(data);
+
+        queue.save((err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(queue._id);
+            }
+        });
+    });
+}
 
 module.exports = {
     addToQueue,
@@ -133,4 +153,5 @@ module.exports = {
     updateQueue,
     findQueueById,
     updateSlectedAmount,
+    createNewQueue
 };
