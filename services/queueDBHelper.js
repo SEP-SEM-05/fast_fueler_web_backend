@@ -121,16 +121,40 @@ const updateSlectedAmount = async (id, amount) => {
     return result;
 }
 
+// remove req after refilled
+const removeReqFromActiveQueue = async (regNo, ftype, reqs) => {
+    let wq = await Queue.findOne({
+        stationID: regNo,
+        state: "active",
+        fuelType: ftype,
+    });
+
+    let reqArr = wq.requests;
+    let reqsToDeleteSet = new Set(reqs);
+
+    let filteredReqs = reqArr.filter((name) => {
+        return !reqsToDeleteSet.has(name);
+    });
+
+    let result = await Queue.findOneAndUpdate(
+      { stationID: regNo, state: "active", fuelType: ftype },
+      { requests: filteredReqs, vehicleCount: filteredReqs.length },
+      { new: true }
+    );
+    return result.requests;
+}
+
 
 module.exports = {
-    addToQueue,
-    findQueuesByRegNoAndFuel,
-    findQueuesByStRegNo,
-    addNewAnnouncedQueue,
-    removeReqsFromWaitingQueue,
-    findAllQueuesAndUpdateByRegNos,
-    updateEndTime,
-    updateQueue,
-    findQueueById,
-    updateSlectedAmount,
+  addToQueue,
+  findQueuesByRegNoAndFuel,
+  findQueuesByStRegNo,
+  addNewAnnouncedQueue,
+  removeReqsFromWaitingQueue,
+  findAllQueuesAndUpdateByRegNos,
+  updateEndTime,
+  updateQueue,
+  findQueueById,
+  updateSlectedAmount,
+  removeReqFromActiveQueue,
 };
