@@ -193,7 +193,30 @@ describe("Database access methods for organizations", () => {
             expect(quriedClient.fullQuotas).toEqual(mockQuotas);
         });
     });
+
+    describe("updateFillingDetails - update the remaining fuel quotas, given the registrationNo.", () => {
+
+        it("should fail to update any document for an invalid registration No.", async () => {
+
+            const mockRegNo = "mockRegNo111";
+            const mockLastFilledDate = null;
+            const mockRemainingQuotas = 20;
+
+            let result = await updateFillingDetails(mockRegNo, mockLastFilledDate, mockRemainingQuotas);
+
+            expect(result === null).toEqual(true);
+        });
+
+        it("should update the remaining quota of a particular organization", async () => {
+
+            const mockRegNo = "mockRegNo999";
+            const mockLastFilledDate = null;
+            const mockRemainingQuotas = 20;
+
+            let result = await updateFillingDetails(mockRegNo, mockLastFilledDate, mockRemainingQuotas);
+
+            expect(result === null).toEqual(false);
+        });
+
+    });
 });
-
-
-// updateFillingDetails,
