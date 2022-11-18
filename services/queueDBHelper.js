@@ -127,6 +127,27 @@ const updateSlectedAmount = async (id, amount) => {
     return result;
 }
 
+// create new queue
+const createNewQueue = (regNo, ftype) => {
+
+    return new Promise(async (resolve, reject) => {
+        let data = {
+            stationID: regNo,
+            fuelType: ftype
+        };
+
+        let queue = new Queue(data);
+
+        queue.save((err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(queue._id);
+            }
+        });
+    });
+}
+
 // remove req after refilled
 const removeReqFromActiveQueue = async (regNo, ftype, reqs) => {
     let wq = await Queue.findOne({
@@ -150,17 +171,17 @@ const removeReqFromActiveQueue = async (regNo, ftype, reqs) => {
     return result.requests;
 }
 
-
 module.exports = {
-  addToQueue,
-  findQueuesByRegNoAndFuel,
-  findQueuesByStRegNo,
-  addNewAnnouncedQueue,
-  removeReqsFromWaitingQueue,
-  findAllQueuesAndUpdateByRegNos,
-  updateEndTime,
-  updateQueue,
-  findQueueById,
-  updateSlectedAmount,
-  removeReqFromActiveQueue,
+    addToQueue,
+    findQueuesByRegNoAndFuel,
+    findQueuesByStRegNo,
+    addNewAnnouncedQueue,
+    removeReqsFromWaitingQueue,
+    findAllQueuesAndUpdateByRegNos,
+    updateEndTime,
+    updateQueue,
+    findQueueById,
+    updateSlectedAmount,
+    createNewQueue,
+    removeReqFromActiveQueue
 };
