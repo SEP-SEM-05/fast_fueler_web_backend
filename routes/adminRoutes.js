@@ -54,5 +54,8 @@ router.get('/orgvehicle', auth.requireAuth, adminController.get_org_vehicles);
 //find one type vehicles of an organization using the registration No. array
 router.get('/typeorgvehicle', auth.requireAuth, adminController.get_type_org_vehicles);
 
+//find each vehicle count for each fuel type
+router.get('/countvehicle', auth.requireAuth, adminController.get_count_vehicle);
+
 
 module.exports = router;
