@@ -292,7 +292,7 @@ const request_fuel = async (req, res) => {
             for(let i = 0; i < all_station_queues.length; i++){
 
                 if(!queue_announced_stations.includes(all_station_queues[i].stationID)){
-                    waiting_queue_ids.push(all_station_queues[i]._id);
+                    waiting_queue_ids.push(all_station_queues[i]._id.toString());
                 }
             }
 

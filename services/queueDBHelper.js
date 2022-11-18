@@ -8,6 +8,7 @@ const Queue = require("../models/queue");
 //add a fuel request to queues of all the station given a queue id array
 const addToQueue = async (queue_ids, reqId) => {
     for (let i = 0; i < queue_ids.length; i++) {
+        console.log( queue_ids[i]);
         if (queue_ids[i].split('&').length > 1) {
             await Queue.updateOne( {_id:queue_ids[i].split('&')[0]}, {$push: { requests: reqId }, vehicleCount:queue_ids[i].split('&')[1]});
         } else {
