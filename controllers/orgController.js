@@ -246,7 +246,7 @@ const request_fuel = async (req, res) => {
 
     let regNo = req.body.registrationNo;
     let fuelType = req.body.fuelType;
-    let remainingQuota = req.body.vehicle.remainingQuota;
+    let remainingQuota = req.body.remainingQuota;
     let req_stations = req.body.stations;
     let priority = req.body.priority;
     let userType = 'organization';

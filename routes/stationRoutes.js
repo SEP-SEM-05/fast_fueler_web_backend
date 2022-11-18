@@ -1,6 +1,7 @@
 const express = require('express');
 const stationController = require('../controllers/stationController');
 const auth = require('../middleware/auth');
+const mobileAuth = require("../middleware/mobileauth");
 
 const router = express.Router();
 
@@ -21,5 +22,14 @@ router.get("/announcedqueues/:regNo", auth.requireAuth, stationController.get_an
 
 // update a queue
 router.post("/updatequeue", auth.requireAuth, stationController.update_queue);
+
+// mobile routes
+
+// get active queues
+router.get("/get-activequeues/:regNo", mobileAuth, stationController.get_active_queues);
+
+// refill
+router.post("/refill", mobileAuth, stationController.fill_request);
+
 
 module.exports = router;
