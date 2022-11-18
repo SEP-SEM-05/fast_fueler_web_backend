@@ -5,18 +5,11 @@ require('dotenv').config();
 const quotaDBHelper = require('../services/quotaDBHelper');
 const stationDBHelper = require('../services/stationDBHelper');
 const vehicleDBHelper = require('../services/vehicleDBHelper');
-const personalDBHelper = require('../services/personalDBHelper');
-const orgDBHelper = require('../services/orgDBHelper');
 
 const nodemailer = require("nodemailer");
 const generator = require('generate-password');
 
-const admin_username = process.env.ADMIN_USERNAME
-const admin_psw = process.env.ADMIN_PASSWORD
-
-const auth = require('../middleware/auth');
 const encHandler = require('../middleware/encryptionHandler');
-
 
 //get admin dashboard info (Quota info)
 const get_dashboard = async (req, res) => {
@@ -78,7 +71,6 @@ const update_fuel_quota = async (req, res) => {
 
 //get all registered stations info 
 const get_registered_station = async (req, res) => {
-
 
     try{
 
@@ -260,213 +252,6 @@ const get_newlyregistered_station = async (req, res) => {
     }
 }
 
-//find all personal clients
-const get_clients = async (req, res) => {
-
-    try{
-
-        let clients = await personalDBHelper.findAllClient();
-        console.log(clients)
-        if(clients !== null){
-            res.json({
-                status: 'ok',
-                clients: clients,
-            });
-        }
-        else{
-            res.status(400).json({
-                status: 'error',
-                error: 'Invalid Vehicle!'
-            });
-        }  
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            status: 'error',
-            error: 'Internal server error!'
-        });
-    }
-}
-
-//find all personal client vehicles
-const get_personal_vehicles = async (req, res) => {
-
-    const vehicleList = [];
-
-    try{
-
-        let clients = await personalDBHelper.findAllClient();
-
-        for (let i = 0; i < clients.length; i++ ) {
-            let client = clients[i]
-            let vehicles = await vehicleDBHelper.findAllByNic(client.nic);
-            //console.log(vehicles)
-            vehicles.forEach(async veh => {
-                vehicleList.push(veh)
-            })
-        }
-        if(vehicleList !== null){
-                
-            res.json({
-                status: 'ok',
-                vehicleList: vehicleList,
-            });
-        }
-        else{
-            res.status(400).json({
-                status: 'error',
-                error: 'Invalid Vehicle!'
-            });
-        }
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            status: 'error',
-            error: 'Internal server error!'
-        });
-    }
-}
-
-//find the personal registered vehicles of a given vehicle type
-const get_type_personal_vehicles = async (req, res) => {
-    
-    const vehicleType = ["A-Bicycle", "B-Car", "C-Lorry", "D-Bus", "G-Agricultural", "J-Special Purpose"];
-    let vehicleCount = [];
-
-    try{
-
-        let clients = await personalDBHelper.findAllClient();
-
-        for (let n = 0; n < vehicleType.length; n++ ) {
-            let type = vehicleType[n];
-            let vehicleList = [];
-
-            for (let i = 0; i < clients.length; i++ ) {
-                let client = clients[i]
-                let vehicles = await vehicleDBHelper.findTypeAllByNic(client.nic,type);
-                for (let j = 0; j < vehicles.length; j++ ) {
-                    vehicleList.push(vehicles[j])
-                }
-            }
-
-            vehicleCount.push(vehicleList.length);
-        };
-
-        
-        if(vehicleCount !== null){
-                
-            res.json({
-                status: 'ok',
-                vehicleCount: vehicleCount,
-            });
-        }
-        else{
-            res.status(400).json({
-                status: 'error',
-                error: 'Invalid Vehicle!'
-            });
-        }
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            status: 'error',
-            error: 'Internal server error!'
-        });
-    }
-}
-
-//find all org client vehicles
-const get_org_vehicles = async (req, res) => {
-
-    const vehicleList = [];
-
-    try{
-
-        let clients = await orgDBHelper.findAllClient();
-
-        for (let i = 0; i < clients.length; i++ ) {
-            let client = clients[i]
-            let vehicles = await vehicleDBHelper.findAllByregistrationNoArray(client.vehicles);
-            //console.log(vehicles)
-            vehicles.forEach(async veh => {
-                vehicleList.push(veh)
-            })
-        }
-        if(vehicleList !== null){
-                
-            res.json({
-                status: 'ok',
-                vehicleList: vehicleList,
-            });
-        }
-        else{
-            res.status(400).json({
-                status: 'error',
-                error: 'Invalid Vehicle!'
-            });
-        }
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            status: 'error',
-            error: 'Internal server error!'
-        });
-    }
-}
-
-//find one type vehicles of an organization using the registration No. array
-const get_type_org_vehicles = async (req, res) => {
-    //let type = req.params.type;
-    const vehicleType = ["A-Bicycle", "B-Car", "C-Lorry", "D-Bus", "G-Agricultural", "J-Special Purpose"];
-    let vehicleCount = [];
-
-    try{
-
-        let clients = await orgDBHelper.findAllClient();
-
-        for (let n = 0; n < vehicleType.length; n++ ) {
-            let type = vehicleType[n];
-            let vehicleList = [];
-
-            for (let i = 0; i < clients.length; i++ ) {
-                let client = clients[i]
-                let vehicles = await vehicleDBHelper.findTypeAllByregistrationNoArray(client.vehicles,type);
-                for (let j = 0; j < vehicles.length; j++ ) {
-                    vehicleList.push(vehicles[j])
-                }
-            }
-
-            vehicleCount.push(vehicleList.length);
-        };
-
-        
-        if(vehicleCount !== null){
-                
-            res.json({
-                status: 'ok',
-                vehicleCount: vehicleCount,
-            });
-        }
-        else{
-            res.status(400).json({
-                status: 'error',
-                error: 'Invalid Vehicle!'
-            });
-        }
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            status: 'error',
-            error: 'Internal server error!'
-        });
-    }
-}
-
 //send email to station
 const send_email = async (req, res) => {
     let regNo = req.body.regNo;
@@ -618,7 +403,6 @@ module.exports = {
     get_dashboard,
     get_registered_station,
     get_unregistered_station,
-    get_clients,
     get_count_registered_station,
     update_fuel_quota,
     register_station,
@@ -627,9 +411,5 @@ module.exports = {
     register_all_station,
     send_email,
     send_email_to_all,
-    get_personal_vehicles,
-    get_type_personal_vehicles,
-    get_org_vehicles,
-    get_type_org_vehicles,
     get_count_vehicle
 }

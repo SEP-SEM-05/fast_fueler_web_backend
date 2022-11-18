@@ -39,23 +39,7 @@ router.post("/sendemail", auth.requireAuth, adminController.send_email);
 // send email to many station
 router.post("/sendmanyemail", auth.requireAuth, adminController.send_email_to_all);
 
-//get all personal clients info
-router.get('/personalclient', auth.requireAuth, adminController.get_clients);
-
-//get all personal client vehicles info
-router.get('/personalvehicle', auth.requireAuth, adminController.get_personal_vehicles);
-
-//find the personal registered vehicles of a given vehicle type
-router.get('/typepersonalvehicle', auth.requireAuth, adminController.get_type_personal_vehicles);
-
-//get all org client vehicles info
-router.get('/orgvehicle', auth.requireAuth, adminController.get_org_vehicles);
-
-//find one type vehicles of an organization using the registration No. array
-router.get('/typeorgvehicle', auth.requireAuth, adminController.get_type_org_vehicles);
-
 //find each vehicle count for each fuel type
 router.get('/countvehicle', auth.requireAuth, adminController.get_count_vehicle);
-
 
 module.exports = router;
