@@ -456,6 +456,27 @@ const get_all_notifications = async (req, res) => {
     }
 }
 
+const mark_as_read = async (req, res) => {
+
+    let id = req.params.id;
+
+    try {
+
+        await notificationDBHelper.mark_as_read(id);
+
+        res.json({
+            status: 'ok',
+        });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            status: 'error',
+            error: 'Internal server error!'
+        });
+    }
+}
+
 module.exports = {
     get_dashboard,
     get_vehicles,
@@ -463,4 +484,5 @@ module.exports = {
     request_fuel,
     get_unread_notification_count,
     get_all_notifications,
+    mark_as_read,
 }

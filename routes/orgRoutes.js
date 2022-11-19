@@ -28,4 +28,8 @@ router.get('/notifyCount/:id', auth.requireAuth, orgController.get_unread_notifi
 router.get('/notifications/:id', auth.requireAuth, orgController.get_all_notifications);
 // router.get('/notifications/:id', orgController.get_all_notifications);
 
+//mark a notification as read
+router.get('/mark/:id', auth.requireAuth, orgController.mark_as_read);
+// router.get('/mark/:id', orgController.mark_as_read);
+
 module.exports = router;
