@@ -196,6 +196,8 @@ const change_stations = async (req, res) => {
 
         if(user !== null){
 
+            //add condition to check not filled reqests
+
             let stations = [];
 
             for(let i = 0; i < req_stations.length; i++){
