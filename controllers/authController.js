@@ -6,6 +6,7 @@ const personalDBHelper = require("../services/personalDBHelper");
 const orgDBHelper = require("../services/orgDBHelper");
 const stationDBHelper = require("../services/stationDBHelper");
 const vehicleDBHelper = require("../services/vehicleDBHelper");
+const queueDBHelper = require("../services/queueDBHelper");
 
 const auth = require("../middleware/auth");
 const encHandler = require("../middleware/encryptionHandler");
@@ -151,6 +152,7 @@ const getstand_post_station = async (req, res) => {
     const regNo = req.body.regNo;
     const tempPassword = req.body.tempPassword;
     let password = req.body.password;
+    const fuelType = ["Petrol 92 Octane", "Petrol 95 Octane", "Auto Diesel", "Super Diesel"];
 
     try {
 
@@ -168,6 +170,10 @@ const getstand_post_station = async (req, res) => {
                 password = await encHandler.encryptCredential(password);
 
                 await stationDBHelper.getStartStation(regNo, password);
+
+                for (const i in fuelType){
+                    await queueDBHelper.createNewQueue(regNo, fuelType[i]);
+                }
 
                 let token_data = {
                     userType: 'station',

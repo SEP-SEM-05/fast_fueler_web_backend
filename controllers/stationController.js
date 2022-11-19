@@ -132,7 +132,6 @@ const get_waiting_queues = async (req, res) => {
 
 // announce a queue
 const announce_fuel_queue = async (req, res) => {
-  //console.log(req.body);
   regNo = req.body.regNo;
   ftype = req.body.fuelType;
   lastAnnounced = req.body.announcedTime;
@@ -147,7 +146,6 @@ const announce_fuel_queue = async (req, res) => {
       ftype,
       lastAnnounced
     ); // update last announced date
-    // console.log(result1);
 
     let reqs = [];
     let dataArr = [];
@@ -180,10 +178,8 @@ const announce_fuel_queue = async (req, res) => {
       vehicles.length,
       selectedAmount
     ); // start a new announced queue
-    // console.log(result2);
 
     let result3 = await notificationDBHelper.addNewNotifications(dataArr);
-    // console.log(result3);
 
     let result4 = await queueDBHelper.removeReqsFromWaitingQueue(
       regNo,
@@ -230,10 +226,9 @@ const get_announced_queues = async (req, res) => {
 
 // update a queue
 const update_queue = async (req, res) => {
-  console.log(req.body);
-  let id = req.body.id;
-  let state = req.body.state;
-  let estEndTime = req.body.estEndTime;
+    let id = req.body.id;
+    let state = req.body.state;
+    let estEndTime = req.body.estEndTime;
 
   try {
     //handle any possible errors
@@ -257,7 +252,6 @@ const update_queue = async (req, res) => {
 const fill_request = async (req, res) => {
   //#provided data
   //reg_no, queue_id, filled_amount, fuel_type, user_type
-  console.log(req.body);
   let regNo = req.body.registrationNo; // vehicle or org
   let stationRegNo = req.body.stationRegNo;
   let queueId = req.body.queueID;
@@ -355,13 +349,20 @@ const fill_request = async (req, res) => {
             let newQueueSelectedAmount =
               parseFloat(queue.selectedAmount) - filledAmount;
             await queueDBHelper.updateSlectedAmount(
-              queue._id,
+              queueId,
               newQueueSelectedAmount.toString()
+            );
+
+
+            await stationDBHelper.reduceFuelAmount(
+              stationRegNo,
+              fuelType,
+              filledAmount
             );
 
             //if selected amount less than or equals zero close the queue
             if (newQueueSelectedAmount <= 0) {
-              await queueDBHelper.updateQueue(queue._id, "ended", null);
+              await queueDBHelper.updateQueue(queueId, "ended", null);
             }
 
             res.json({
@@ -420,7 +421,6 @@ const get_active_queues = async (req, res) => {
 
     try {
         let queues = await queueDBHelper.findQueuesByStRegNo(regNo, ["active"]);
-        // console.log(queues);
         let f_qs = [];
         for (let i = 0; i < queues.length; i++) {
           let queue = queues[i];
@@ -447,7 +447,6 @@ const get_active_queues = async (req, res) => {
           a._id = queue.id.toString();
           f_qs.push(a);
         }
-        // console.log(f_qs[1].requests);
         res.json(f_qs);
     } catch (err) {
         console.log(err);

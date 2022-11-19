@@ -7,15 +7,21 @@ const Queue = require("../models/queue");
 
 //add a fuel request to queues of all the station given a queue id array
 const addToQueue = async (queue_ids, reqId) => {
-
-    let result = await Queue.updateMany({ _id: { $in: queue_ids } }, { $push: { requests: reqId } });
-    return result;
-}
+    for (let i = 0; i < queue_ids.length; i++) {
+        console.log( queue_ids[i]);
+        if (queue_ids[i].split('&').length > 1) {
+            await Queue.updateOne( {_id:queue_ids[i].split('&')[0]}, {$push: { requests: reqId }, vehicleCount:queue_ids[i].split('&')[1]});
+        } else {
+            await Queue.updateOne( {_id:queue_ids[i].split('&')[0]}, {$push: { requests: reqId }});
+        }
+    } 
+    return; 
+} 
 
 // get any exsisting announneced/waiting queues given the registration No. of the station and the fuel type
 const findQueuesByRegNoAndFuel = async (regNos, fuelType) => {
 
-    let queues = await Queue.find({ stationID: { $in: regNos }, fuelType, state: { $in: ["waiting", "announced"] } });
+    let queues = await Queue.find({ stationID: { $in: regNos }, fuelType, state: { $in: ["waiting", "announced", "active"] } });
     return queues;
 }
 
@@ -121,6 +127,27 @@ const updateSlectedAmount = async (id, amount) => {
     return result;
 }
 
+// create new queue
+const createNewQueue = (regNo, ftype) => {
+
+    return new Promise(async (resolve, reject) => {
+        let data = {
+            stationID: regNo,
+            fuelType: ftype
+        };
+
+        let queue = new Queue(data);
+
+        queue.save((err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(queue._id);
+            }
+        });
+    });
+}
+
 // remove req after refilled
 const removeReqFromActiveQueue = async (regNo, ftype, reqs) => {
     let wq = await Queue.findOne({
@@ -144,17 +171,17 @@ const removeReqFromActiveQueue = async (regNo, ftype, reqs) => {
     return result.requests;
 }
 
-
 module.exports = {
-  addToQueue,
-  findQueuesByRegNoAndFuel,
-  findQueuesByStRegNo,
-  addNewAnnouncedQueue,
-  removeReqsFromWaitingQueue,
-  findAllQueuesAndUpdateByRegNos,
-  updateEndTime,
-  updateQueue,
-  findQueueById,
-  updateSlectedAmount,
-  removeReqFromActiveQueue,
+    addToQueue,
+    findQueuesByRegNoAndFuel,
+    findQueuesByStRegNo,
+    addNewAnnouncedQueue,
+    removeReqsFromWaitingQueue,
+    findAllQueuesAndUpdateByRegNos,
+    updateEndTime,
+    updateQueue,
+    findQueueById,
+    updateSlectedAmount,
+    createNewQueue,
+    removeReqFromActiveQueue
 };

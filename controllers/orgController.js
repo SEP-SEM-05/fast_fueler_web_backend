@@ -6,6 +6,8 @@ const orgDBHelper = require('../services/orgDBHelper');
 const stationDBHelper = require('../services/stationDBHelper');
 const vehicleDBHelper = require('../services/vehicleDBHelper');
 const notificationDBHelper = require('../services/notificationDBHelper');
+const requestDBHelper = require("../services/requestDBHelper");
+const queueDBHelper = require("../services/queueDBHelper");
 
 const auth = require('../middleware/auth');
 const encHandler = require('../middleware/encryptionHandler');
@@ -292,9 +294,9 @@ const request_fuel = async (req, res) => {
 
             for(let i = 0; i < all_station_queues.length; i++){
 
-                if(all_station_queues[i].state === "announced" && parseFloat(all_station_queues[i].selectedAmount) >= remainingQuota){
-
-                    announced_queue_ids.push(all_station_queues[i]._id);
+                if((all_station_queues[i].state === "announced" || all_station_queues[i].state === "active") && parseFloat(all_station_queues[i].selectedAmount) >= remainingQuota){
+                    let vehicle_count = parseInt(all_station_queues[i].vehicleCount);
+                    announced_queue_ids.push(all_station_queues[i]._id.toString() + '&' + (vehicle_count+1));
                     queue_announced_stations.push(all_station_queues[i].stationID);
 
                     let station_str = "";
@@ -308,7 +310,6 @@ const request_fuel = async (req, res) => {
                         }
                     }
 
-                    let vehicle_count = parseInt(all_station_queues[i].vehicleCount);
                     let start_time = new Date(all_station_queues[i].queueStartTime);
                     let curr_end_time = new Date(all_station_queues[i].estimatedEndTime);
                     let est_time_for_vehicle = Math.abs(Math.round((start_time.getTime() - curr_end_time.getTime()) / (1000 * 60 * vehicle_count)));
@@ -337,7 +338,7 @@ const request_fuel = async (req, res) => {
             for(let i = 0; i < all_station_queues.length; i++){
 
                 if(!queue_announced_stations.includes(all_station_queues[i].stationID)){
-                    waiting_queue_ids.push(all_station_queues[i]._id);
+                    waiting_queue_ids.push(all_station_queues[i]._id.toString());
                 }
             }
 
