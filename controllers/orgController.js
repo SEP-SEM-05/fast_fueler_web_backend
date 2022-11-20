@@ -433,8 +433,6 @@ const get_all_notifications = async (req, res) => {
                 return_notifications.push(return_not);
             }
 
-            await notificationDBHelper.mark_as_read(user.registrationNo);
-
             res.json({
                 status: 'ok',
                 notifications: return_notifications,
