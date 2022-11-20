@@ -71,6 +71,15 @@ const updateAmount = async (regNo, fuelType, addedAmount) => {
     return result.volumes.toJSON();
 }
 
+// reduce fuel amount after refill
+const reduceFuelAmount = async (regNo, fuelType, amount) => {
+    let station = await findStationByRegNo(regNo);
+    let vol = station.volumes.toJSON();
+    vol[fuelType] -= amount;
+    let result = await Station.findOneAndUpdate({ registrationNo: regNo }, { volumes: vol }, { new: true});
+    return result.volumes.toJSON();
+}
+
 // update last announced time
 const updateLastAnnounced = async (regNo, ftype ,time) => {
     let station = await findStationByRegNo(regNo);
@@ -150,5 +159,6 @@ module.exports = {
   findAllNewlyregisteredStations,
   registerAllStation,
   saveTempPass,
-  getStartStation
+  getStartStation,
+  reduceFuelAmount,
 };

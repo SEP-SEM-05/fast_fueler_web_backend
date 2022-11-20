@@ -133,7 +133,7 @@ const add_vehicle = async (req, res) => {
 
             let stations = [];
 
-            for(let i = 0; i < req_stations.length; i++){
+            for (let i = 0; i < req_stations.length; i++) {
                 let station_regNo = req_stations[i].split('-')[0].trim();
                 stations.push(station_regNo);
             }
@@ -166,9 +166,11 @@ const change_stations = async (req, res) => {
 
         if (user !== null) {
 
+            //add condition to check not filled reqests
+
             let stations = [];
 
-            for(let i = 0; i < req_stations.length; i++){
+            for (let i = 0; i < req_stations.length; i++) {
                 let station_regNo = req_stations[i].split('-')[0].trim();
                 stations.push(station_regNo);
             }
@@ -215,7 +217,7 @@ const request_fuel = async (req, res) => {
 
             let stations = [];
 
-            for(let i = 0; i < req_stations.length; i++){
+            for (let i = 0; i < req_stations.length; i++) {
                 let station_regNo = req_stations[i].split('-')[0].trim();
                 stations.push(station_regNo);
             }
@@ -242,30 +244,30 @@ const request_fuel = async (req, res) => {
             let queue_announced_stations = [];
 
             let notifications = [];
-
-            for(let i = 0; i < all_station_queues.length; i++){
+            console.log(all_station_queues);
+            for (let i = 0; i < all_station_queues.length; i++) {
 
                 //check if the remaining quota is less than or equals to the selected amount of the queue
-                if(all_station_queues[i].state === "announced" && parseFloat(all_station_queues[i].selectedAmount) >= remainingQuota){
-
-                    announced_queue_ids.push(all_station_queues[i]._id);
+                if ((all_station_queues[i].state === "announced" || all_station_queues[i].state === "active") && parseFloat(all_station_queues[i].selectedAmount) >= remainingQuota) {
+                    // console.log("methana", all_station_queues[i]);
+                    let vehicle_count = parseInt(all_station_queues[i].vehicleCount);
+                    announced_queue_ids.push(all_station_queues[i]._id.toString() + '&' + (vehicle_count + 1));
                     queue_announced_stations.push(all_station_queues[i].stationID);
 
                     let station_str = "";
-                    for(let k = 0; k < req_stations.length; k++){
+                    for (let k = 0; k < req_stations.length; k++) {
 
                         let req_station = req_stations[k].split('-')[0].trim();
 
-                        if(all_station_queues[i].stationID === req_station){
+                        if (all_station_queues[i].stationID === req_station) {
                             station_str = req_stations[k];
                             break;
                         }
                     }
 
-                    let vehicle_count = parseInt(all_station_queues[i].vehicleCount);
                     let start_time = new Date(all_station_queues[i].queueStartTime);
                     let curr_end_time = new Date(all_station_queues[i].estimatedEndTime);
-                    let est_time_for_vehicle = Math.abs(Math.round((start_time.getTime() - curr_end_time.getTime()) / (1000 * 60 * vehicle_count)));
+                    let est_time_for_vehicle = vehicle_count == 0 ? Math.abs(Math.round((start_time.getTime() - curr_end_time.getTime()) / (1000 * 60))) : Math.abs(Math.round((start_time.getTime() - curr_end_time.getTime()) / (1000 * 60 * vehicle_count)));
                     let new_end_time = curr_end_time.setMinutes(curr_end_time.getMinutes() + est_time_for_vehicle);
 
                     //update the new end time
@@ -283,18 +285,20 @@ const request_fuel = async (req, res) => {
                     notifications.push(notification);
                 }
             }
-            
+
             //save notifications
             await notificationDBHelper.addNewNotifications(notifications);
 
+            // console.log(queue_announced_stations);
             let waiting_queue_ids = [];
-            for(let i = 0; i < all_station_queues.length; i++){
+            for (let i = 0; i < all_station_queues.length; i++) {
 
-                if(!queue_announced_stations.includes(all_station_queues[i].stationID)){
-                    waiting_queue_ids.push(all_station_queues[i]._id);
+                if (!queue_announced_stations.includes(all_station_queues[i].stationID)) {
+                    waiting_queue_ids.push(all_station_queues[i]._id.toString());
                 }
             }
 
+            // console.log(announced_queue_ids.concat(waiting_queue_ids));
             await queueDBHelper.addToQueue(announced_queue_ids.concat(waiting_queue_ids), reqId);
 
             res.json({
@@ -365,10 +369,10 @@ const get_all_notifications = async (req, res) => {
             let notifications = await notificationDBHelper.getNotifications(user.nic);
 
             let return_notifications = [];
-            for(let i = 0; i < notifications.length; i++){
+            for (let i = 0; i < notifications.length; i++) {
 
                 let created_date = new Date(notifications[i].createdAt);
-                
+
                 let hours24 = created_date.getHours();
                 let hours12 = (hours24 === 0 ? 0 : hours24 > 12 ? hours24 - 12 : hours24);
                 let minutes = created_date.getMinutes();
@@ -386,7 +390,7 @@ const get_all_notifications = async (req, res) => {
                 return_notifications.push(return_not);
             }
 
-            await notificationDBHelper.mark_as_read(user.nic);
+            // await notificationDBHelper.mark_as_read(user.nic);
 
             res.json({
                 status: 'ok',
@@ -409,6 +413,27 @@ const get_all_notifications = async (req, res) => {
     }
 }
 
+const mark_as_read = async (req, res) => {
+
+    let id = req.params.id;
+
+    try {
+
+        await notificationDBHelper.mark_as_read(id);
+
+        res.json({
+            status: 'ok',
+        });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            status: 'error',
+            error: 'Internal server error!'
+        });
+    }
+}
+
 module.exports = {
     get_dashboard,
     add_vehicle,
@@ -416,4 +441,5 @@ module.exports = {
     request_fuel,
     get_unread_notification_count,
     get_all_notifications,
+    mark_as_read,
 }

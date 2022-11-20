@@ -11,6 +11,8 @@ const orgRoutes = require('./routes/orgRoutes');
 const stationRoutes = require('./routes/stationRoutes');
 const mobileauthroutes = require('./routes/mobile/auth');
 
+// const tempRoutes = require('./temp/tempRoutes');
+
 const makeApp = () => {
     // express app
     const app = express();
@@ -53,6 +55,9 @@ const makeApp = () => {
     app.use('/org', orgRoutes);
     app.use('/station', stationRoutes);
     app.use("/mobileauth", mobileauthroutes);
+
+    //route used to populate db
+    // app.use("/temp", tempRoutes);
 
     return app;
 }

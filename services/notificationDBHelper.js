@@ -47,9 +47,9 @@ const getNotifications = async (regNo) => {
 }
 
 //mark notification as read given a regNo(nic)
-const mark_as_read = async (regNo) => {
+const mark_as_read = async (id) => {
 
-    let result = await Notification.updateMany({regNo: regNo}, {isRead: true});
+    let result = await Notification.findByIdAndUpdate(id, {isRead: true});
     return result;
 }
 

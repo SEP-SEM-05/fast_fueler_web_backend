@@ -57,13 +57,19 @@ const countEachTypeVehicle = async (fuelType, vehType) => {
     return vehicleCount;
 }
 
+const findAllByregistrationNoArray = async (regNoArray) => {
+  let vehicles = await Vehicle.find({ registrationNo: { $in: regNoArray } });
+  return vehicles;
+};
+
 module.exports = {
-    findVehicleByRegNo,
-    findVehicleByRegNoAndEngNo,
-    findAllByNic,
-    updateStationsAndRegister,
-    registerAll,
-    getQuotas,
-    updateFillingDetails,
-    countEachTypeVehicle
-}
+  findVehicleByRegNo,
+  findVehicleByRegNoAndEngNo,
+  findAllByNic,
+  updateStationsAndRegister,
+  registerAll,
+  getQuotas,
+  updateFillingDetails,
+  countEachTypeVehicle,
+  findAllByregistrationNoArray,
+};

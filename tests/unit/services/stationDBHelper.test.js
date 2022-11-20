@@ -75,7 +75,7 @@ describe("Database access methods for fuel stations", () => {
         });
 
         it("should return a valid station object for an exsisting id", async () => {
-            const quriedClient = await findStationByRegNo("6345263462");
+            const quriedClient = await findStationByID("6378f6140e64b5dfda404b44");
 
             expect(quriedClient.registrationNo).toEqual("6345263462");
         });
@@ -208,7 +208,7 @@ describe("Database access methods for fuel stations", () => {
 
         it("should update the refresh token for a valid id", async () => {
 
-            const mockId = "633ab4f95d62f03a23b978c5";
+            const mockId = "6378f6140e64b5dfda404b44";
             const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVHlwZSI6Im9yZ2FuaXphdGlvbiIsImlkIjoiNjMzNThiODQ2OTg4MjZmZjZhYTYxMzYwIiwicmVnaXN0cmF0aW9uTm8iOiI1NjUyMzc2MjczMjMiLCJpYXQiOjE2NjQ4NzUzODksImV4cCI6MTY2NDk2MTc4OX0.F_dM8F_1BtlV0DsA5juWO2rE7KD_gzf2XrNfEsyBU1E";
 
             let result = await saveRefreshToken(mockToken, mockId);
