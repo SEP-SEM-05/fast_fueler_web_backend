@@ -9,7 +9,7 @@ const conn = require('../../db_connection');
 
 const auth = require("../../middleware/auth");
 
-describe('Personal Client endpoints', () => {
+describe('Organization endpoints', () => {
 
     beforeAll(async () => {
 
